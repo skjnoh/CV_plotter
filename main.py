@@ -8,10 +8,12 @@ from tkinter import Entry
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.backends.backend_tkagg
 from Equations import *
 import numpy
 from scipy.optimize import curve_fit
 from EChemAnalysis import *
+import csv
 
 
 
@@ -47,8 +49,8 @@ class App(tk.Tk):
         self.Fc_pot_entry.insert(0, 0.000)
         self.Fc_pot_entry.pack()
 
-        tk.Radiobutton(self, text = 'tab', variable=self.delimiter, value='\t').pack()
-        tk.Radiobutton(self, text=';', variable=self.delimiter, value=';').pack()
+        #tk.Radiobutton(self, text = 'tab', variable=self.delimiter, value='\t').pack()
+        #tk.Radiobutton(self, text=';', variable=self.delimiter, value=';').pack()
 
         for program, val in CVsources:
             tk.Radiobutton(self, text = program, variable=self.CVfileSource, value=val).pack()
@@ -88,8 +90,11 @@ class App(tk.Tk):
     def fileprompt(self):
         self.filename = tk.filedialog.askopenfilename()
         if self.filename:
+            with open(app.filename) as rawdata:
+                self.delimiter.set(csv.Sniffer().sniff(rawdata.read(10000)).delimiter)
             self.filenamebox.config(text="File: "+self.filename)
             CVtoList(CVList, self.filename, float(self.Fc_pot_entry.get()), self.delimiter.get(), self.CVfileSource.get())
+
 
     def PlotCV_app(self):
         plotCVlist(CVList, self.plot)
