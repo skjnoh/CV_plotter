@@ -45,6 +45,8 @@ class App(tk.Tk):
         self.filenamebox = tk.Label(self)
         self.filenamebox.pack()
 
+        self.Fc_textbox = tk.Label(self, text="Fc/Fc+ potential:")
+        self.Fc_textbox.pack()
         self.Fc_pot_entry = tk.Entry(self) # note that this is string and will have to be converted later.
         self.Fc_pot_entry.insert(0, 0.000)
         self.Fc_pot_entry.pack()
@@ -95,7 +97,6 @@ class App(tk.Tk):
             self.filenamebox.config(text="File: "+self.filename)
             CVtoList(CVList, self.filename, float(self.Fc_pot_entry.get()), self.delimiter.get(), self.CVfileSource.get())
 
-
     def PlotCV_app(self):
         plotCVlist(CVList, self.plot)
         #self.plot.set_ylabel("Current (A)")
@@ -123,6 +124,7 @@ def CVtoList(CVList, filename, Fc_pot = 0, delimiter = ";", CVfileSource = 101):
     f.close()
 
 def plotCVlist(CVList, ax):
+    ax.cla()
     for CV in CVList:
         try:
             CV.plot('Potential vs Fc/Fc+ (V)', y='WE(1).Current (A)',ax=ax)
@@ -143,5 +145,5 @@ def getECSA(CVList):
 if __name__ == '__main__':
     CVList = []
     app = App(CVList)
-    app.title('title!')
+    app.title('CV Plotter')
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
