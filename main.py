@@ -14,6 +14,7 @@ from scipy.optimize import curve_fit
 from EChemAnalysis import *
 
 
+
 # Things to fix/add
 # 1. Tk window popping up and staying when loading file
 
