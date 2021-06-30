@@ -14,6 +14,7 @@ import numpy
 from scipy.optimize import curve_fit
 from EChemAnalysis import *
 import csv
+from scipy import signal
 
 
 
@@ -63,8 +64,17 @@ class App(tk.Tk):
         #self.debugBtn = tk.Button(self, text = 'debug', command = self.checkvar)
         #self.debugBtn.pack()
 
-        self.plotCV = tk.Button(self, text = 'Plot CVs', command = self.PlotCV_app)
-        self.plotCV.pack()
+        self.buttonframe = tk.Frame(self)
+        self.buttonframe.pack()
+
+        self.plotCV = tk.Button(self.buttonframe, text = 'Plot CVs', command = self.PlotCV_app)
+        self.plotCV.pack(side = tk.LEFT)
+
+        self.ECSAbutton = tk.Button(self.buttonframe, text = 'ECSA', command = self.getECSA_app)
+        self.ECSAbutton.pack(side=tk.LEFT)
+
+        self.subtractCVbutton = tk.Button(self.buttonframe, text = 'subtractCVs', command=self.subtractCVs)
+        self.subtractCVbutton.pack(side = tk.LEFT)
 
         #make space for matplotlib objects
         self.fig = matplotlib.figure.Figure(figsize=(6, 4.5),dpi=100)
@@ -102,6 +112,17 @@ class App(tk.Tk):
         #self.plot.set_ylabel("Current (A)")
         #self.plot.clear()
         self.fig.tight_layout()
+        self.canvas.draw()
+
+    def getECSA_app(self):
+        popt,pcov = getECSA(CVList)
+        print(format(popt[0],'.3e') + ' F capacitance measured')
+
+    def subtractCVs(self):
+        a = CValigner(CVList[-2], CVList[-1])
+        self.plot.cla()
+        self.plot.plot(a['Potential applied (V)'], signal.savgol_filter(a['WE(1).Current (A)'], 53, 7))
+        self.plot.plot(a['Potential applied (V)'][0],a['WE(1).Current (A)'][0],'<k', markersize=12)
         self.canvas.draw()
 
 #method for loading CV into a dictionary. (Asks for file and then appends it to Dict)
