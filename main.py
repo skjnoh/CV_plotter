@@ -52,17 +52,8 @@ class App(tk.Tk):
         self.Fc_pot_entry.insert(0, 0.000)
         self.Fc_pot_entry.pack()
 
-        #tk.Radiobutton(self, text = 'tab', variable=self.delimiter, value='\t').pack()
-        #tk.Radiobutton(self, text=';', variable=self.delimiter, value=';').pack()
-
         for program, val in CVsources:
             tk.Radiobutton(self, text = program, variable=self.CVfileSource, value=val).pack()
-        #self.delimiter_entry = tk.Entry(self)
-        #self.delimiter_entry.insert(0,string=";")
-        #self.delimiter_entry.pack()
-
-        #self.debugBtn = tk.Button(self, text = 'debug', command = self.checkvar)
-        #self.debugBtn.pack()
 
         self.buttonframe = tk.Frame(self)
         self.buttonframe.pack()
@@ -77,7 +68,7 @@ class App(tk.Tk):
         self.subtractCVbutton.pack(side = tk.LEFT)
 
         #make space for matplotlib objects
-        self.fig = matplotlib.figure.Figure(figsize=(6, 4.5),dpi=100)
+        self.fig = matplotlib.figure.Figure(figsize=(6, 5),dpi=100)
 
         self.plot = self.fig.add_subplot(111)
         self.plot.set_ylabel("Current (A)")
@@ -110,7 +101,6 @@ class App(tk.Tk):
     def PlotCV_app(self):
         plotCVlist(CVList, self.plot)
         #self.plot.set_ylabel("Current (A)")
-        #self.plot.clear()
         self.fig.tight_layout()
         self.canvas.draw()
 
@@ -121,8 +111,10 @@ class App(tk.Tk):
     def subtractCVs(self):
         a = CValigner(CVList[-2], CVList[-1])
         self.plot.cla()
-        self.plot.plot(a['Potential applied (V)'], signal.savgol_filter(a['WE(1).Current (A)'], 53, 7))
-        self.plot.plot(a['Potential applied (V)'][0],a['WE(1).Current (A)'][0],'<k', markersize=12)
+        self.plot.plot(a["Potential vs Fc/Fc+ (V)"], signal.savgol_filter(a['WE(1).Current (A)'], 53, 7))
+        self.plot.plot(a["Potential vs Fc/Fc+ (V)"][0],a['WE(1).Current (A)'][0],'<k', markersize=12)
+        self.plot.set_xlabel("Potential vs Fc/Fc$^+$ (V)")
+        self.plot.set_ylabel("Current Difference (A)")
         self.canvas.draw()
 
 #method for loading CV into a dictionary. (Asks for file and then appends it to Dict)
@@ -135,12 +127,12 @@ def CVtoList(CVList, filename, Fc_pot = 0, delimiter = ";", CVfileSource = 101):
 
     if CVfileSource == 101:
         CVList.append(pd.read_csv(f, delimiter=delimiter, engine='python'))
-        if Fc_pot != 0:
-            if "Potential applied (V)" in CVList[-1].columns:
-                CVcopy = CVList[-1]["Potential applied (V)"].rename("Potential vs Fc/Fc+ (V)") - Fc_pot
-            else:
-                CVcopy = CVList[-1]["WE(1).Potential (V)"].rename("Potential vs Fc/Fc+ (V)") - Fc_pot
-            CVList[-1] = pd.concat((CVList[-1], CVcopy), axis=1)
+
+        if "Potential applied (V)" in CVList[-1].columns:
+            CVcopy = CVList[-1]["Potential applied (V)"].rename("Potential vs Fc/Fc+ (V)") - Fc_pot
+        else:
+            CVcopy = CVList[-1]["WE(1).Potential (V)"].rename("Potential vs Fc/Fc+ (V)") - Fc_pot
+        CVList[-1] = pd.concat((CVList[-1], CVcopy), axis=1)
 
     f.close()
 
@@ -159,7 +151,6 @@ def plotCVlist(CVList, ax):
 def getECSA(CVList):
     Cap_array = ECSA_Analysis(CVList[-1])
     popt, pcov = curve_fit(linear, Cap_array[0], Cap_array[1])
-    print("slope = " + str(popt))
     return popt, Cap_array
 
 # Press the green button in the gutter to run the script.

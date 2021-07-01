@@ -29,10 +29,10 @@ def ECSA_Analysis(df_ECSA):
 
 def CValigner(df_CV1, df_CV2):
     #as written, this function assumes that scan direction is negative, with same scan rate and lower vertex potential.
-    min_start_pot = min(df_CV1["Potential applied (V)"][0], df_CV2["Potential applied (V)"][0])
-    df_CV1_sub = df_CV1[df_CV1["Potential applied (V)"] < min_start_pot].reset_index()
-    df_CV2_sub = df_CV2[df_CV2["Potential applied (V)"] < min_start_pot].reset_index()
+    min_start_pot = min(df_CV1["Potential vs Fc/Fc+ (V)"][0], df_CV2["Potential vs Fc/Fc+ (V)"][0])
+    df_CV1_sub = df_CV1[df_CV1["Potential vs Fc/Fc+ (V)"] < min_start_pot].reset_index()
+    df_CV2_sub = df_CV2[df_CV2["Potential vs Fc/Fc+ (V)"] < min_start_pot].reset_index()
     new_cur_series = df_CV1_sub['WE(1).Current (A)'] - df_CV2_sub['WE(1).Current (A)']
-    frame = {"Potential applied (V)":df_CV1_sub["Potential applied (V)"], 'WE(1).Current (A)':new_cur_series}
+    frame = {"Potential vs Fc/Fc+ (V)":df_CV1_sub["Potential vs Fc/Fc+ (V)"], 'WE(1).Current (A)':new_cur_series}
     return pd.DataFrame(frame)
 
