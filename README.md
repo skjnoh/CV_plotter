@@ -9,6 +9,8 @@ find the rc file by typing the following commands into your python console
 
 > import matplotlib   
 > matplotlib.matplotlib_fname()   
+
+Which will output something like:
 '/home/foo/.config/matplotlib/matplotlibrc'
 
 Modify the matplotlibrc file as you please or replace with the file in this repo
